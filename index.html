@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050816">
+  <meta name="description" content="Explore the Solar System in an interactive 3D experience.">
+  <title>SPACE EXPLORER — Journey Through the Solar System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="scene" aria-label="Interactive 3D solar system"></div>
+  <div class="vignette"></div>
+  <header class="topbar">
+    <a class="brand" href="#" id="homeButton" aria-label="Space Explorer home">
+      <span class="brand-mark">✳</span>
+      <span><strong>SPACE<span>EXPLORER</span></strong><small>AN INTERACTIVE JOURNEY</small></span>
+    </a>
+    <div class="top-status"><span class="status-dot"></span><span>LIVE SIMULATION</span><span class="status-divider"></span><span id="clock">00:00:00 UTC</span></div>
+    <button class="icon-button" id="soundButton" title="Toggle ambient sound" aria-label="Toggle sound">♫</button>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p class="eyebrow"><span></span> OUR COSMIC NEIGHBORHOOD</p>
+      <h1>Explore the<br><em>Solar System.</em></h1>
+      <p class="intro-copy">Eight planets. One star. Countless wonders.<br>Choose a world and begin your journey.</p>
+      <div class="intro-hint"><span class="mouse-icon">⌖</span> DRAG TO ROTATE <b>·</b> SCROLL TO ZOOM</div>
+    </section>
+
+    <section class="planet-dock" aria-label="Choose a planet">
+      <div class="dock-heading"><span>DESTINATIONS</span><span class="dock-line"></span><span>01 — 08</span></div>
+      <div class="planet-list" id="planetList"></div>
+    </section>
+
+    <aside class="info-card" id="infoCard">
+      <div class="card-topline"><span id="planetIndex">PLANET 03 / 08</span><span class="live-tag">FIELD NOTES</span></div>
+      <div class="planet-heading">
+        <div><p class="eyebrow" id="planetType">TERRESTRIAL PLANET</p><h2 id="planetName">Earth</h2></div>
+        <span class="planet-symbol" id="planetSymbol">⊕</span>
+      </div>
+      <p class="planet-description" id="planetDescription">Our pale blue home, and the only world known to support life.</p>
+      <div class="fact-grid">
+        <div class="fact"><span>DISTANCE FROM SUN</span><strong id="distance">149.6 million km</strong></div>
+        <div class="fact"><span>ORBITAL PERIOD</span><strong id="year">365.25 days</strong></div>
+        <div class="fact"><span>DAY LENGTH</span><strong id="day">23h 56m</strong></div>
+        <div class="fact"><span>KNOWN MOONS</span><strong id="moons">1</strong></div>
+      </div>
+      <div class="card-footer"><span class="planet-color" id="planetColor"></span><span id="planetTagline">THE BLUE MARBLE</span><button id="focusButton">FOCUS ON PLANET <span>↗</span></button></div>
+    </aside>
+
+    <div class="scene-label"><span class="crosshair">+</span><span id="sceneLabel">SOL SYSTEM // HELIOCENTRIC VIEW</span></div>
+    <div class="bottom-controls">
+      <button id="pauseButton" class="control-button"><span id="pauseIcon">Ⅱ</span><span id="pauseText">PAUSE ORBITS</span></button>
+      <button id="resetButton" class="control-button">↺ <span>RESET VIEW</span></button>
+      <span class="scale-note">PLANET SIZES & DISTANCES ARE NOT TO SCALE</span>
+      <button id="fullscreenButton" class="control-button fullscreen">⛶ <span>FULL SCREEN</span></button>
+    </div>
+  </main>
+  <div class="loading" id="loading"><div class="loader-orbit"><i></i></div><span>PREPARING YOUR JOURNEY</span></div>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
