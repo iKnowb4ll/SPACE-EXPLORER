@@ -209,3 +209,20 @@ function renderConstellations(){$('#constellationGrid').innerHTML=constellations
 async function loadGallery(query){const status=$('#galleryStatus'),grid=$('#galleryGrid');status.textContent='Searching NASA’s public media library...';grid.innerHTML='';try{const url='https://images-api.nasa.gov/search?q='+encodeURIComponent(query)+'&media_type=image&page_size=18';const response=await fetch(url);if(!response.ok)throw new Error('NASA image search unavailable');const data=await response.json();const items=(data.collection?.items||[]).filter(x=>x.links?.some(l=>l.render==='image')&&x.data?.[0]?.title);if(!items.length){status.textContent='No images found. Try a different search.';return}status.textContent='Showing '+items.length+' results from NASA’s public media library.';items.forEach(item=>{const d=item.data[0],link=item.links.find(l=>l.render==='image');const card=document.createElement('article');card.className='gallery-card';const img=document.createElement('img');img.loading='lazy';img.src=link.href;img.alt=d.title;const info=document.createElement('div');const title=document.createElement('b');title.textContent=d.title;const small=document.createElement('small');small.textContent=(d.date_created||'NASA image').slice(0,10)+' · NASA';info.append(title,small);card.append(img,info);grid.appendChild(card)})}catch(e){status.textContent='Could not load NASA images right now. Check your internet connection and try again.'}}
 $('#gallerySearchButton').addEventListener('click',()=>loadGallery($('#gallerySearch').value.trim()||'space'));$('#gallerySearch').addEventListener('keydown',e=>{if(e.key==='Enter')loadGallery($('#gallerySearch').value.trim()||'space')});
 
+
+
+try{
+ init3D();
+}catch(error){
+ const host=$('.sim-stage');
+ if(host)host.innerHTML='<div class="stage-fallback"><strong>3D VIEW UNAVAILABLE</strong><p>Your browser could not start WebGL. You can still use the encyclopedia, quiz, constellation guide, and photo gallery.</p></div>';
+ console.error('SPACE EXPLORER 3D initialization failed:',error);
+}
+renderObjectChips();
+renderTravelChoices();
+renderEncyclopedia();
+renderConstellations();
+renderQuiz();
+updateFavoriteCount();
+selectObject('Earth');
+loadGallery('galaxy nebula');
