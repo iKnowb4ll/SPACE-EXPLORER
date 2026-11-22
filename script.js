@@ -93,7 +93,7 @@ function makePlanetGroup(body) {
  const material=new THREE.MeshStandardMaterial({map:makeTexture(body),roughness:body.id==='sun'?.45:.88,metalness:0});
  if(body.id==='sun'){
   const sun=new THREE.Mesh(new THREE.SphereGeometry(body.display,64,64),new THREE.MeshBasicMaterial({map:makeTexture(body)}));
-  group.add(sun);worldMeshes.set(body.id,sun);
+  sun.userData.objectId=body.id;group.add(sun);worldMeshes.set(body.id,sun);
   const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:makeGlowTexture(),color:0xffc16e,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
   glow.scale.set(8,8,1);group.add(glow);
   const light=new THREE.PointLight(0xffd7a0,145,240,1.35);group.add(light);
@@ -269,7 +269,7 @@ $('#focusSelected').addEventListener('click',()=>selectObject(selectedId,true));
 $('#showWorlds').addEventListener('click',()=>showView('worlds'));
 $('#orbitToggle').addEventListener('click',()=>{orbitVisible=!orbitVisible;orbitLines.forEach(line=>line.visible=orbitVisible);$('#orbitToggle').classList.toggle('active',orbitVisible);$('#orbitToggle').textContent='Orbits '+(orbitVisible?'ON':'OFF');$('#orbitToggle').setAttribute('aria-pressed',String(orbitVisible));});
 $('#starToggle').addEventListener('click',()=>{starsVisible=!starsVisible;if(starField)starField.visible=starsVisible;$('#starToggle').classList.toggle('active',starsVisible);$('#starToggle').textContent='Stars '+(starsVisible?'ON':'OFF');$('#starToggle').setAttribute('aria-pressed',String(starsVisible));});
-$('#beltToggle').addEventListener('click',()=>{beltVisible=!beltVisible;if(asteroidField)asteroidField.visible=beltVisible;$('#beltToggle').classList.toggle('active',beltVisible);$('#beltToggle').setAttribute('aria-pressed',String(beltVisible));});
+$('#beltToggle').addEventListener('click',()=>{beltVisible=!beltVisible;if(asteroidField)asteroidField.visible=beltVisible;$('#beltToggle').classList.toggle('active',beltVisible);$('#beltToggle').textContent='Asteroid belt '+(beltVisible?'ON':'OFF');$('#beltToggle').setAttribute('aria-pressed',String(beltVisible));});
 $('#timeSpeed').addEventListener('input',event=>{timeSpeed=Number(event.target.value);$('#speedLabel').textContent=timeSpeed.toFixed(1)+'×';});
 function updateClock(){const now=new Date();$('#utcClock').textContent=now.toISOString().slice(11,16)+' UTC';}
 updateClock();setInterval(updateClock,30000);
