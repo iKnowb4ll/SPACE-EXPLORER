@@ -1,74 +1,81 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#050816">
-  <meta name="description" content="Explore the Solar System in an interactive 3D experience.">
-  <title>SPACE EXPLORER — Journey Through the Solar System</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
-      }
-    }
-  </script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050816">
+<meta name="description" content="Explore planets, moons, galaxies, black holes and the wonders of space.">
+<title>SPACE EXPLORER — Beyond the Solar System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
 </head>
 <body>
-  <div id="scene" aria-label="Interactive 3D solar system"></div>
-  <div class="vignette"></div>
-  <header class="topbar">
-    <a class="brand" href="#" id="homeButton" aria-label="Space Explorer home">
-      <span class="brand-mark">✳</span>
-      <span><strong>SPACE<span>EXPLORER</span></strong><small>AN INTERACTIVE JOURNEY</small></span>
-    </a>
-    <div class="top-status"><span class="status-dot"></span><span>LIVE SIMULATION</span><span class="status-divider"></span><span id="clock">00:00:00 UTC</span></div>
-    <button class="icon-button" id="soundButton" title="Toggle ambient sound" aria-label="Toggle sound">♫</button>
-  </header>
-
-  <main>
-    <section class="intro">
-      <p class="eyebrow"><span></span> OUR COSMIC NEIGHBORHOOD</p>
-      <h1>Explore the<br><em>Solar System.</em></h1>
-      <p class="intro-copy">Eight planets. One star. Countless wonders.<br>Choose a world and begin your journey.</p>
-      <div class="intro-hint"><span class="mouse-icon">⌖</span> DRAG TO ROTATE <b>·</b> SCROLL TO ZOOM</div>
-    </section>
-
-    <section class="planet-dock" aria-label="Choose a planet">
-      <div class="dock-heading"><span>DESTINATIONS</span><span class="dock-line"></span><span>01 — 08</span></div>
-      <div class="planet-list" id="planetList"></div>
-    </section>
-
-    <aside class="info-card" id="infoCard">
-      <div class="card-topline"><span id="planetIndex">PLANET 03 / 08</span><span class="live-tag">FIELD NOTES</span></div>
-      <div class="planet-heading">
-        <div><p class="eyebrow" id="planetType">TERRESTRIAL PLANET</p><h2 id="planetName">Earth</h2></div>
-        <span class="planet-symbol" id="planetSymbol">⊕</span>
-      </div>
-      <p class="planet-description" id="planetDescription">Our pale blue home, and the only world known to support life.</p>
-      <div class="fact-grid">
-        <div class="fact"><span>DISTANCE FROM SUN</span><strong id="distance">149.6 million km</strong></div>
-        <div class="fact"><span>ORBITAL PERIOD</span><strong id="year">365.25 days</strong></div>
-        <div class="fact"><span>DAY LENGTH</span><strong id="day">23h 56m</strong></div>
-        <div class="fact"><span>KNOWN MOONS</span><strong id="moons">1</strong></div>
-      </div>
-      <div class="card-footer"><span class="planet-color" id="planetColor"></span><span id="planetTagline">THE BLUE MARBLE</span><button id="focusButton">FOCUS ON PLANET <span>↗</span></button></div>
-    </aside>
-
-    <div class="scene-label"><span class="crosshair">+</span><span id="sceneLabel">SOL SYSTEM // HELIOCENTRIC VIEW</span></div>
-    <div class="bottom-controls">
-      <button id="pauseButton" class="control-button"><span id="pauseIcon">Ⅱ</span><span id="pauseText">PAUSE ORBITS</span></button>
-      <button id="resetButton" class="control-button">↺ <span>RESET VIEW</span></button>
-      <span class="scale-note">PLANET SIZES & DISTANCES ARE NOT TO SCALE</span>
-      <button id="fullscreenButton" class="control-button fullscreen">⛶ <span>FULL SCREEN</span></button>
-    </div>
-  </main>
-  <div class="loading" id="loading"><div class="loader-orbit"><i></i></div><span>PREPARING YOUR JOURNEY</span></div>
-  <script type="module" src="script.js"></script>
-</body>
-</html>
+<div id="scene" aria-label="Interactive 3D space scene"></div><div class="space-shade"></div>
+<header class="topbar">
+<a class="brand" href="#" data-view="dashboard"><span class="brand-mark">✳</span><span><strong>SPACE<span>EXPLORER</span></strong><small>THE UNIVERSE AT YOUR FINGERTIPS</small></span></a>
+<div class="top-status"><i></i> EXPLORATION SYSTEM ONLINE <b id="utcClock">--:--:-- UTC</b></div>
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+</header>
+<aside class="sidebar" id="sidebar">
+<div class="side-label">MISSION CONTROL</div>
+<button class="nav-item active" data-view="dashboard"><span>⌂</span> Dashboard</button>
+<button class="nav-item" data-view="galaxy"><span>✧</span> Galaxy map</button>
+<button class="nav-item" data-view="travel"><span>➤</span> Space travel</button>
+<button class="nav-item" data-view="encyclopedia"><span>▤</span> Encyclopedia</button>
+<button class="nav-item" data-view="quiz"><span>◇</span> Space quiz</button>
+<button class="nav-item" data-view="constellations"><span>✳</span> Constellations</button>
+<button class="nav-item" data-view="gallery"><span>▧</span> Photo gallery</button>
+<button class="nav-item" data-view="favorites"><span>♡</span> Favorites <b id="favoriteCount">0</b></button>
+<div class="side-bottom"><div class="system-card"><span class="pulse"></span><div><b>DEEP SPACE NETWORK</b><small>Systems operational</small></div></div><small>SPACE EXPLORER v2.0 · EDUCATIONAL SIMULATION</small></div>
+</aside>
+<main class="workspace">
+<section class="view active" id="view-dashboard">
+<div class="welcome-row"><div><p class="eyebrow">✦ YOUR COSMIC JOURNEY BEGINS HERE</p><h1>Explore the <em>unknown.</em></h1><p class="subheading">Discover worlds, travel through galaxies, and learn the science behind our universe.</p></div><div class="date-chip"><span>MISSION DATE</span><b id="missionDate">--</b></div></div>
+<div class="hero-grid">
+<article class="hero-card"><div class="hero-copy"><span class="tag">FEATURED DESTINATION</span><h2>Our Solar<br><em>System</em></h2><p>Eight planets orbiting one star. Start your journey in our cosmic backyard.</p><button class="primary-btn" data-go="travel">ENTER SOLAR SYSTEM <span>↗</span></button></div><div class="hero-art"><div class="hero-orbit o1"></div><div class="hero-orbit o2"></div><div class="hero-sun"></div><i class="hero-planet p1"></i><i class="hero-planet p2"></i><i class="hero-planet p3"></i></div></article>
+<div class="quick-stats"><div class="stat-card"><span>KNOWN PLANETS</span><b>8</b><small>In our Solar System</small></div><div class="stat-card"><span>KNOWN DWARF PLANETS</span><b>5+</b><small>Officially recognized</small></div><div class="stat-card"><span>THE MILKY WAY</span><b>100B+</b><small>Estimated stars</small></div></div>
+</div>
+<div class="section-heading"><div><p class="eyebrow">QUICK ACCESS</p><h2>Choose your destination</h2></div><span class="muted">SELECT A MISSION</span></div>
+<div class="destination-grid">
+<button class="destination-card" data-go="galaxy"><span class="destination-icon">✧</span><b>Galaxy map</b><small>Navigate the cosmic neighborhood</small></button>
+<button class="destination-card" data-go="encyclopedia"><span class="destination-icon">◉</span><b>Celestial library</b><small>Planets, moons, stars and more</small></button>
+<button class="destination-card" data-go="quiz"><span class="destination-icon">◇</span><b>Knowledge check</b><small>Test what you know about space</small></button>
+<button class="destination-card" data-go="gallery"><span class="destination-icon">▧</span><b>Space imagery</b><small>Explore photographs from NASA</small></button>
+</div>
+<div class="fact-banner"><span class="fact-star">✦</span><div><span class="tag">COSMIC DISCOVERY</span><p id="dailyFact">A day on Venus is longer than its year.</p></div><button id="newFact">NEW FACT ↻</button></div>
+</section>
+<section class="view" id="view-galaxy">
+<div class="view-heading"><p class="eyebrow">NAVIGATE THE COSMOS</p><h1>Galaxy <em>map.</em></h1><p class="subheading">A stylized 3D star map. Select an object to inspect it or travel there.</p></div>
+<div class="sim-layout"><div class="sim-stage"><div class="stage-label">3D COSMIC VIEW <span>DRAG TO ROTATE · SCROLL TO ZOOM</span></div><div class="stage-actions"><button id="pauseOrbits">Ⅱ PAUSE</button><button id="resetCamera">↺ RESET</button></div></div><div class="object-panel"><span class="tag">SELECTED OBJECT</span><h2 id="objectName">The Sun</h2><p id="objectDesc">The star at the center of our Solar System.</p><div id="objectFacts" class="object-facts"></div><button class="primary-btn full" id="travelSelected">TRAVEL TO OBJECT ↗</button><button class="secondary-btn full" id="favoriteSelected">♡ SAVE TO FAVORITES</button></div></div>
+<div class="section-heading compact"><h2>Explore objects</h2><span class="muted">SELECT TO INSPECT</span></div><div class="object-chips" id="objectChips"></div>
+</section>
+<section class="view" id="view-travel">
+<div class="view-heading"><p class="eyebrow">FLIGHT DECK</p><h1>Space <em>travel.</em></h1><p class="subheading">Choose a destination and take a closer look. This is a stylized educational simulation, not a real flight model.</p></div>
+<div class="travel-layout"><div class="travel-scene"><div class="travel-hud"><span>EXPLORATION VESSEL · NX-01</span><span id="travelStatus">STANDBY</span></div><div class="travel-center"><div class="reticle">+</div><p id="travelMessage">SELECT A DESTINATION TO BEGIN</p></div><div class="travel-footer"><span>SIMULATED FLIGHT</span><span id="travelDistance">DESTINATION: NONE</span></div></div><div class="travel-panel"><span class="tag">DESTINATION SELECTOR</span><h2>Where to next?</h2><div id="travelChoices" class="travel-choices"></div><button class="primary-btn full" id="launchTravel">INITIATE JOURNEY ↗</button></div></div>
+</section>
+<section class="view" id="view-encyclopedia">
+<div class="view-heading"><p class="eyebrow">THE CELESTIAL ARCHIVE</p><h1>Space <em>encyclopedia.</em></h1><p class="subheading">A growing field guide to objects in our universe.</p></div>
+<div class="searchbar"><span>⌕</span><input id="encyclopediaSearch" placeholder="Search planets, moons, stars, black holes..." autocomplete="off"><kbd>SEARCH</kbd></div>
+<div class="filter-row" id="categoryFilters"><button class="filter active" data-filter="All">All objects</button><button class="filter" data-filter="Planet">Planets</button><button class="filter" data-filter="Moon">Moons</button><button class="filter" data-filter="Dwarf planet">Dwarf planets</button><button class="filter" data-filter="Star">Stars</button><button class="filter" data-filter="Other">Other wonders</button></div>
+<div class="encyclopedia-grid" id="encyclopediaGrid"></div>
+</section>
+<section class="view" id="view-quiz">
+<div class="view-heading"><p class="eyebrow">TEST YOUR COSMIC KNOWLEDGE</p><h1>Space <em>quiz.</em></h1><p class="subheading">Ten questions, one universe. Learn something new with every attempt.</p></div>
+<div class="quiz-card"><div class="quiz-top"><span class="tag">KNOWLEDGE MISSION</span><span id="quizProgress">QUESTION 1 / 10</span></div><div class="progress"><i id="quizProgressBar"></i></div><h2 id="quizQuestion">Loading question...</h2><div id="quizAnswers" class="quiz-answers"></div><p id="quizFeedback" class="quiz-feedback" aria-live="polite"></p><div class="quiz-actions"><span id="quizScore">SCORE: 0</span><button class="primary-btn" id="nextQuestion" disabled>NEXT QUESTION →</button></div></div>
+</section>
+<section class="view" id="view-constellations">
+<div class="view-heading"><p class="eyebrow">PATTERNS IN THE NIGHT SKY</p><h1>Constellation <em>guide.</em></h1><p class="subheading">Meet familiar star patterns and the stories they have inspired across cultures.</p></div>
+<div class="constellation-grid" id="constellationGrid"></div>
+</section>
+<section class="view" id="view-gallery">
+<div class="view-heading"><p class="eyebrow">IMAGES OF OUR UNIVERSE</p><h1>Space <em>gallery.</em></h1><p class="subheading">Search NASA's public image and video library. An internet connection is required.</p></div>
+<div class="searchbar"><span>⌕</span><input id="gallerySearch" value="galaxy nebula" placeholder="Search NASA images..."><button id="gallerySearchButton">SEARCH ↗</button></div>
+<p id="galleryStatus" class="muted gallery-status">Loading featured space images...</p><div class="gallery-grid" id="galleryGrid"></div>
+</section>
+<section class="view" id="view-favorites">
+<div class="view-heading"><p class="eyebrow">YOUR PERSONAL COLLECTION</p><h1>Saved <em>objects.</em></h1><p class="subheading">Your favorite discoveries, stored in this browser.</p></div><div class="encyclopedia-grid" id="favoritesGrid"></div><p class="muted" id="emptyFavorites">No saved objects yet. Explore the encyclopedia and save something you like.</p>
+</section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script type="module" src="script.js"></script>
+</body></html>
