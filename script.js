@@ -35,7 +35,7 @@ const $ = (selector) => document.querySelector(selector);
 let scene, camera, renderer, controls, raycaster, pointer;
 let worldMeshes = new Map(), moonMeshes = new Map(), planetGroups = new Map(), orbitLines = [];
 let starField, asteroidField, paused = false, orbitVisible = true, starsVisible = true, beltVisible = false;
-let timeSpeed = 1, selectedId = 'earth', cameraTween = null, lastFrame = 0;
+let timeSpeed = 1, selectedId = 'earth', cameraTween = null, lastFrame = 0; beltVisible = true;
 const allObjects = [...worlds, ...dwarfPlanets, ...moons];
 const bodyById = new Map(allObjects.map(body => [body.id, body]));
 
@@ -178,10 +178,10 @@ function initScene() {
 }
 function resizeScene(){if(!renderer||!camera)return;const host=$('#threeContainer');camera.aspect=host.clientWidth/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight);}
 function currentPosition(bodyId){
- const body=bodyById.get(bodyId);const group=planetGroups.get(bodyId);
- if(bodyId==='sun')return new THREE.Vector3(0,0,0);
- if(!body||!group)return new THREE.Vector3();
- scene.updateMatrixWorld(true);return group.getWorldPosition(new THREE.Vector3());
+ const body=bodyById.get(bodyId);if(bodyId==='sun')return new THREE.Vector3(0,0,0);if(!body)return new THREE.Vector3();
+ scene.updateMatrixWorld(true);
+ const moon=moonMeshes.get(bodyId);if(moon)return moon.getWorldPosition(new THREE.Vector3());
+ const group=planetGroups.get(bodyId);return group?group.getWorldPosition(new THREE.Vector3()):new THREE.Vector3();
 }
 function focusObject(id){
  const target=currentPosition(id);const body=bodyById.get(id);const distance=Math.max(5,(body?.display||.4)*6+4);
@@ -215,7 +215,7 @@ function updateDetail(id){
  $('#planetPortrait').style.setProperty('--portrait-light','#'+body.light.toString(16).padStart(6,'0'));
  $('#planetPortrait').style.setProperty('--portrait-glow','rgba(115,180,240,.22)');
  $('#portraitSymbol').textContent='';
- const stats=[['DIAMETER',body.diameter],['GRAVITY',body.gravity],['MEAN TEMP.',body.temperature],['DAY / ROTATION',body.day],['YEAR / ORBIT',body.year],['DISTANCE',body.distance]];
+ const stats=[['DIAMETER',body.diameter],['MASS',body.mass],['GRAVITY',body.gravity],['MEAN TEMP.',body.temperature],['DAY / ROTATION',body.day],['YEAR / ORBIT',body.year],['DISTANCE',body.distance],['ATMOSPHERE',body.atmosphere],['MOONS',body.moons]];
  $('#detailStats').innerHTML=stats.map(([label,value])=>'<div class="stat"><span>'+label+'</span><b>'+value+'</b></div>').join('');
  document.querySelectorAll('[data-world-id]').forEach(button=>button.classList.toggle('active',button.dataset.worldId===id));
  document.querySelectorAll('[data-moon-id]').forEach(button=>button.classList.toggle('active',button.dataset.moonId===id));
