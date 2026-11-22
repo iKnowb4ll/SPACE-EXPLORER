@@ -51,7 +51,7 @@ const $=s=>document.querySelector(s);
 const safeStore={get(){try{return JSON.parse(localStorage.getItem('spaceExplorerFavorites')||'[]')}catch{return[]}},set(v){try{localStorage.setItem('spaceExplorerFavorites',JSON.stringify(v))}catch{}}};
 let favorites=safeStore.get(),selectedName='Earth',selectedIndex=3,paused=false,travelTarget='Earth',quizIndex=0,quizScore=0,answered=false,currentFilter='All';
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200)}
-function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$('#sidebar').classList.remove('open');if(name==='favorites')renderFavorites();if(name==='galaxy'||name==='travel')setTimeout(()=>{if(renderer)renderer.setSize(innerWidth,innerHeight)},80)}
+function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$('#sidebar').classList.remove('open');if(name==='favorites')renderFavorites();if(name==='galaxy'||name==='travel')setTimeout(()=>{if(renderer)resize3D()},80)}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();showView(b.dataset.view)}));
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.go)));
 $('#menuToggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
