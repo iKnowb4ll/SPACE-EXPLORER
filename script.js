@@ -166,8 +166,12 @@ function initScene() {
  asteroidField=new THREE.Points(asteroidGeometry,new THREE.PointsMaterial({color:0xa99f92,size:.075,transparent:true,opacity:.77}));asteroidField.visible=beltVisible;scene.add(asteroidField);
  moons.forEach(addMoon);
  raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();
+ let pointerStart=null;
+ renderer.domElement.addEventListener('pointerdown',event=>{pointerStart={x:event.clientX,y:event.clientY};});
  renderer.domElement.addEventListener('pointerup',event=>{
-  if(event.pointerType==='touch')return;
+  if(!pointerStart)return;
+  const moved=Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y);pointerStart=null;
+  if(moved>8)return;
   const rect=renderer.domElement.getBoundingClientRect();pointer.x=(event.clientX-rect.left)/rect.width*2-1;pointer.y=-(event.clientY-rect.top)/rect.height*2+1;
   raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects([...worldMeshes.values(),...moonMeshes.values()],false);
   if(hits.length){const id=hits[0].object.userData.objectId;if(id)selectObject(id,true);}
