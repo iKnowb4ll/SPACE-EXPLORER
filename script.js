@@ -61,7 +61,33 @@ function randomFact(){const f=facts[Math.floor(Math.random()*facts.length)];$('#
 $('#newFact').addEventListener('click',randomFact);randomFact();
 
 let scene,camera,renderer,controls,planetMeshes=[],orbitGroups=[],raycaster,mouse,clock3d,cameraTween=null,selectedMesh=null;
-function textureFor(color,index){const c=document.createElement('canvas');c.width=512;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#'+color.toString(16).padStart(6,'0');ctx.fillRect(0,0,512,256);for(let i=0;i<170;i++){const y=Math.random()*256,h=THREE.MathUtils.randFloat(1,10),a=THREE.MathUtils.randFloat(.025,.18);ctx.fillStyle=i%2?'rgba(255,255,255,'+a+')':'rgba(10,15,30,'+a+')';if([5,6,7,8].includes(index))ctx.fillRect(0,y,512,h);else{ctx.beginPath();ctx.ellipse(Math.random()*512,y,THREE.MathUtils.randFloat(5,45),h,Math.random(),0,Math.PI*2);ctx.fill()}}if(index===3){ctx.fillStyle='rgba(66,160,105,.85)';for(let i=0;i<40;i++){ctx.beginPath();ctx.ellipse(Math.random()*512,Math.random()*256,Math.random()*22+4,Math.random()*10+2,Math.random()*3,0,Math.PI*2);ctx.fill()}}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+function textureFor(color,index){
+ const name=objects[index]?.name||'';
+ const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=512;
+ const ctx=canvas.getContext('2d');
+ const base='#'+color.toString(16).padStart(6,'0');
+ const grad=ctx.createLinearGradient(0,0,0,512);grad.addColorStop(0,base);grad.addColorStop(.5,base);grad.addColorStop(1,'#111827');ctx.fillStyle=grad;ctx.fillRect(0,0,1024,512);
+ let seed=index*7919+37;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ // Fine surface variation gives each world a repeatable, non-flat surface.
+ for(let n=0;n<2600;n++){const x=rand()*1024,y=rand()*512,r=rand()*2.8+.35;ctx.fillStyle=rand()>.5?'rgba(255,255,255,.055)':'rgba(0,0,0,.075)';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+ if(name==='Earth'){
+  ctx.fillStyle='#347b50';
+  const land=[[[90,145],[150,95],[225,115],[250,180],[210,220],[180,295],[130,265],[105,210]],[[270,270],[330,250],[370,300],[350,390],[315,440],[285,365]],[[470,100],[555,80],[620,130],[590,190],[535,205],[495,160]],[[560,250],[650,235],[710,290],[680,370],[620,400],[575,330]],[[740,100],[850,115],[890,185],[840,225],[775,190]]];
+  land.forEach(points=>{ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill()});
+  ctx.strokeStyle='rgba(240,250,255,.38)';ctx.lineWidth=8;for(let y=55;y<500;y+=82){ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(300,y-35,700,y+35,1024,y-10);ctx.stroke()}
+ }
+ if(['Jupiter','Saturn'].includes(name)){
+  for(let y=12;y<512;y+=26+rand()*25){ctx.fillStyle=rand()>.5?'rgba(255,238,208,.24)':'rgba(70,42,25,.19)';ctx.fillRect(0,y,1024,7+rand()*17)}
+  if(name==='Jupiter'){ctx.fillStyle='rgba(160,70,40,.7)';ctx.beginPath();ctx.ellipse(700,300,95,39,-.12,0,Math.PI*2);ctx.fill()}
+ }
+ if(name==='Mars'||name==='Mercury'||name==='Moon'||name==='Ceres'||name==='Pluto'){
+  for(let n=0;n<95;n++){const x=rand()*1024,y=rand()*512,r=2+rand()*17;ctx.fillStyle='rgba(20,18,17,.18)';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=2;ctx.stroke()}
+ }
+ if(name==='Venus'||name==='Neptune'||name==='Uranus'){
+  ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=14;for(let y=20;y<512;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(260,y-35,700,y+35,1024,y-12);ctx.stroke()}
+ }
+ const t=new THREE.CanvasTexture(canvas);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t
+}
 function init3D(){
  const host=$('.sim-stage');
  scene=new THREE.Scene();
@@ -112,17 +138,28 @@ function init3D(){
    ring.rotation.x=Math.PI/2.3;mesh.add(ring);
   }
   if(o.kind==='Black hole'){
-   mesh.material=new THREE.MeshBasicMaterial({color:0x010106});
-   const disk=new THREE.Mesh(new THREE.TorusGeometry(o.size*1.65,o.size*.42,16,120),new THREE.MeshBasicMaterial({color:o.color,side:THREE.DoubleSide,transparent:true,opacity:.88}));
-   disk.rotation.x=.28;group.add(disk);
-   const outer=new THREE.Mesh(new THREE.TorusGeometry(o.size*2.05,.07,8,120),new THREE.MeshBasicMaterial({color:0xffbd83,transparent:true,opacity:.72}));
-   outer.rotation.x=.28;group.add(outer);
+   mesh.material=new THREE.MeshBasicMaterial({color:0x000005});
+   const diskMat=new THREE.MeshBasicMaterial({color:o.color,side:THREE.DoubleSide,transparent:true,opacity:.78});
+   const disk=new THREE.Mesh(new THREE.RingGeometry(o.size*1.25,o.size*2.65,128),diskMat);
+   disk.rotation.x=Math.PI/2.35;group.add(disk);
+   const innerGlow=new THREE.Mesh(new THREE.TorusGeometry(o.size*1.22,.12,12,128),new THREE.MeshBasicMaterial({color:0xffd39a,transparent:true,opacity:.9}));
+   innerGlow.rotation.x=Math.PI/2.35;group.add(innerGlow);
+   const halo=new THREE.Mesh(new THREE.SphereGeometry(o.size*1.12,32,32),new THREE.MeshBasicMaterial({color:0x080611,side:THREE.BackSide,transparent:true,opacity:.7}));
+   group.add(halo);
   }
   if(o.kind==='Galaxy'||o.kind==='Nebula'){
-   const halo=new THREE.Mesh(new THREE.SphereGeometry(o.size*1.55,32,32),new THREE.MeshBasicMaterial({color:o.color,transparent:true,opacity:.12,side:THREE.BackSide}));
-   group.add(halo);
-   const swirl=new THREE.Mesh(new THREE.TorusGeometry(o.size*1.25,.045,6,100),new THREE.MeshBasicMaterial({color:o.color,transparent:true,opacity:.6}));
-   swirl.rotation.x=.7;group.add(swirl);
+   const cloudPositions=[],cloudColors=[];
+   for(let n=0;n<1500;n++){
+    const arm=n%2,rad=Math.pow(Math.random(),.62)*o.size*2.7;
+    const angle=rad*.9+arm*Math.PI+THREE.MathUtils.randFloatSpread(.7);
+    const thickness=o.kind==='Galaxy'?.12:.65;
+    cloudPositions.push(Math.cos(angle)*rad,THREE.MathUtils.randFloatSpread(thickness*o.size),Math.sin(angle)*rad);
+    const col=new THREE.Color(o.color);col.multiplyScalar(THREE.MathUtils.randFloat(.55,1.35));cloudColors.push(col.r,col.g,col.b);
+   }
+   const cloudGeo=new THREE.BufferGeometry();cloudGeo.setAttribute('position',new THREE.Float32BufferAttribute(cloudPositions,3));cloudGeo.setAttribute('color',new THREE.Float32BufferAttribute(cloudColors,3));
+   const cloud=new THREE.Points(cloudGeo,new THREE.PointsMaterial({size:o.kind==='Galaxy'?.075:.12,vertexColors:true,transparent:true,opacity:.88,depthWrite:false}));
+   cloud.rotation.x=o.kind==='Galaxy'?.35:.9;group.add(cloud);
+   if(o.kind==='Galaxy'){const core=new THREE.Mesh(new THREE.SphereGeometry(o.size*.35,24,24),new THREE.MeshBasicMaterial({color:0xffe5c4,transparent:true,opacity:.5}));group.add(core)}
   }
   if(o.kind==='Star cluster'){
    const starPositions=[];
@@ -171,5 +208,4 @@ function constellationSVG(c){const lines=c.lines.map(([a,b])=>'<line x1="'+c.sta
 function renderConstellations(){$('#constellationGrid').innerHTML=constellations.map(c=>'<article class="constellation-card">'+constellationSVG(c)+'<h3>'+c.name+'</h3><small>BEST VIEWED: '+c.season.toUpperCase()+'</small><p>'+c.story+'</p></article>').join('')}
 async function loadGallery(query){const status=$('#galleryStatus'),grid=$('#galleryGrid');status.textContent='Searching NASA’s public media library...';grid.innerHTML='';try{const url='https://images-api.nasa.gov/search?q='+encodeURIComponent(query)+'&media_type=image&page_size=18';const response=await fetch(url);if(!response.ok)throw new Error('NASA image search unavailable');const data=await response.json();const items=(data.collection?.items||[]).filter(x=>x.links?.some(l=>l.render==='image')&&x.data?.[0]?.title);if(!items.length){status.textContent='No images found. Try a different search.';return}status.textContent='Showing '+items.length+' results from NASA’s public media library.';items.forEach(item=>{const d=item.data[0],link=item.links.find(l=>l.render==='image');const card=document.createElement('article');card.className='gallery-card';const img=document.createElement('img');img.loading='lazy';img.src=link.href;img.alt=d.title;const info=document.createElement('div');const title=document.createElement('b');title.textContent=d.title;const small=document.createElement('small');small.textContent=(d.date_created||'NASA image').slice(0,10)+' · NASA';info.append(title,small);card.append(img,info);grid.appendChild(card)})}catch(e){status.textContent='Could not load NASA images right now. Check your internet connection and try again.'}}
 $('#gallerySearchButton').addEventListener('click',()=>loadGallery($('#gallerySearch').value.trim()||'space'));$('#gallerySearch').addEventListener('keydown',e=>{if(e.key==='Enter')loadGallery($('#gallerySearch').value.trim()||'space')});
-async function loadLiveSpaceData(){try{const r=await fetch('https://api.wheretheiss.at/v1/satellites/25544');if(!r.ok)throw new Error('ISS data unavailable');const d=await r.json();const iss={name:'International Space Station',kind:'Live orbital data',color:0x7ce7f2,size:.3,orbit:0,desc:'A continuously crewed research laboratory orbiting Earth. Position below is retrieved live when the service is available.',distance:'Altitude '+Math.round(d.altitude)+' km',fact:'Speed '+Math.round(d.velocity)+' km/h',tag:'Live satellite telemetry'};const old=objects.findIndex(x=>x.name===iss.name);if(old>=0)objects.splice(old,1);objects.push(iss);renderObjectChips();renderEncyclopedia();}catch{const status=document.createElement('p');status.className='muted';status.textContent='Live ISS telemetry is temporarily unavailable. Other explorer features still work.';$('#view-galaxy').appendChild(status)}}
-try{init3D()}catch(error){const host=$('.sim-stage');host.innerHTML='<div class="stage-fallback"><strong>3D VIEW UNAVAILABLE</strong><p>Your browser or graphics settings could not start WebGL. The encyclopedia, quiz, gallery and other learning tools are still available.</p></div>';console.error('SPACE EXPLORER 3D initialization failed:',error)}renderObjectChips();renderTravelChoices();renderEncyclopedia();renderConstellations();renderQuiz();updateFavoriteCount();selectObject('Earth');loadGallery('galaxy nebula');loadLiveSpaceData();
+
