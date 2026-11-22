@@ -1,24 +1,23 @@
 # SPACE EXPLORER 🌌
 
-An interactive space exploration website built with **HTML, CSS, JavaScript, and Three.js**.
+An educational astronomy website built with HTML, CSS, JavaScript, and Three.js.
 
-## Explore
-- Mission-control dashboard with quick links and a rotating discovery fact
-- Interactive 3D Solar System and stylized galaxy map
-- Selectable planets, dwarf planets, moons, comets, asteroids, star clusters, nebulae, galaxies, and black holes
-- Planet and celestial-object encyclopedia with search and category filters
-- 3D planet surfaces, Saturn's rings, starfield, and black-hole accretion disk
-- Space travel destination selector and simulated navigation
-- Earth view through the 3D globe in the Solar System
-- Space quiz with ten questions, scoring, and explanations
-- Constellation guide with star-pattern diagrams
-- NASA public image-library search and photo gallery
+## Main features
+- Mission-control dashboard with astronomy facts
+- Interactive 3D Solar System with the Sun and eight planets
+- Selectable dwarf planets, moons, asteroids, comets, black holes, galaxies, star clusters, and nebulae
+- Procedural planet surface textures, Saturn's rings, starfield, and stylized deep-space objects
+- Camera controls: drag to rotate, scroll to zoom, select objects to focus
+- Destination mode for inspecting selected celestial objects (not a real flight simulator)
+- Searchable encyclopedia with object categories
+- Ten-question astronomy quiz with scoring and explanations
+- Constellation guide
+- NASA public image-library search
 - Favorites saved in the current browser
-- Live International Space Station telemetry when the public data service is reachable
-- Responsive layout for desktop, tablet, and mobile
+- Responsive desktop, tablet, and mobile layout
 
 ## Run locally
-An internet connection is required for Three.js, fonts, NASA image search, and live ISS telemetry.
+An internet connection is required for Three.js, fonts, and NASA image search.
 
 Use VS Code with the Live Server extension and open `index.html`.
 
@@ -33,17 +32,17 @@ Then visit http://localhost:8000. Do not open the HTML file directly with `file:
 2. Select **Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**.
 4. Select branch **main** and folder **/(root)**, then save.
-5. Wait for the deployment to finish.
+5. Wait for deployment to finish.
 
 Site URL: https://iknowb4ll.github.io/SPACE-EXPLORER/
 
 ## Controls
-- In the galaxy map, drag to rotate and scroll to zoom.
-- Select a celestial-object chip or click a visible planet to inspect it.
-- Use **Focus** / **Travel** to move the camera toward a destination.
+- In the 3D map, drag to rotate and scroll to zoom.
+- Select an object chip or visible object to inspect it.
+- Use destination mode to focus the camera on an object.
 - Pause or resume orbital motion and reset the camera.
 - Search and filter the encyclopedia.
 - Save objects to Favorites; saved items remain in that browser.
 
-## Data and accuracy notes
-This is an educational visualization, not a physically accurate scale model or flight simulator. Planet sizes, distances, and orbital paths are stylized. NASA image search and ISS telemetry use public services and may occasionally be unavailable due to network, browser, or service limitations. Favorites are stored locally in the browser and are not synced between devices.
+## Accuracy notes
+This is a stylized educational model, not a scale-accurate astronomy simulator. Planet sizes, distances, object positions, and orbital speeds are simplified. NASA image search depends on the public NASA Images API and may be unavailable temporarily.
