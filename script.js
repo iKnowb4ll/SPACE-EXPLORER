@@ -62,15 +62,95 @@ $('#newFact').addEventListener('click',randomFact);randomFact();
 
 let scene,camera,renderer,controls,planetMeshes=[],orbitGroups=[],raycaster,mouse,clock3d,cameraTween=null,selectedMesh=null;
 function textureFor(color,index){const c=document.createElement('canvas');c.width=512;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#'+color.toString(16).padStart(6,'0');ctx.fillRect(0,0,512,256);for(let i=0;i<170;i++){const y=Math.random()*256,h=THREE.MathUtils.randFloat(1,10),a=THREE.MathUtils.randFloat(.025,.18);ctx.fillStyle=i%2?'rgba(255,255,255,'+a+')':'rgba(10,15,30,'+a+')';if([5,6,7,8].includes(index))ctx.fillRect(0,y,512,h);else{ctx.beginPath();ctx.ellipse(Math.random()*512,y,THREE.MathUtils.randFloat(5,45),h,Math.random(),0,Math.PI*2);ctx.fill()}}if(index===3){ctx.fillStyle='rgba(66,160,105,.85)';for(let i=0;i<40;i++){ctx.beginPath();ctx.ellipse(Math.random()*512,Math.random()*256,Math.random()*22+4,Math.random()*10+2,Math.random()*3,0,Math.PI*2);ctx.fill()}}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
-function init3D(){const host=$('.sim-stage');scene=new THREE.Scene();scene.background=new THREE.Color(0x050816);camera=new THREE.PerspectiveCamera(48,host.clientWidth/Math.max(1,host.clientHeight),.1,700);camera.position.set(0,25,47);renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(host.clientWidth,host.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.domElement.style.position='absolute';renderer.domElement.style.inset='0';renderer.domElement.style.zIndex='1';host.appendChild(renderer.domElement);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.05;controls.minDistance=5;controls.maxDistance=180;controls.maxPolarAngle=Math.PI*.49;scene.add(new THREE.AmbientLight(0x91b5ec,.8));const sunLight=new THREE.PointLight(0xffd6a0,210,200,1.3);scene.add(sunLight);
-const starGeo=new THREE.BufferGeometry(),pos=new Float32Array(5200*3);for(let i=0;i<5200;i++){const r=THREE.MathUtils.randFloat(65,240),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(2),q=Math.sqrt(1-z*z);pos.set([r*q*Math.cos(a),r*z,r*q*Math.sin(a)],i*3)}starGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xc6ddff,size:.32,transparent:true,opacity:.9})));
-const sun=new THREE.Mesh(new THREE.SphereGeometry(2.1,48,48),new THREE.MeshBasicMaterial({color:0xffbc65}));scene.add(sun);const glow=new THREE.PointLight(0xffa64d,70,40);scene.add(glow);
-objects.forEach((o,i)=>{if(o.orbit===0&&i>0)return;const group=new THREE.Group();scene.add(group);orbitGroups.push(group);const mesh=new THREE.Mesh(new THREE.SphereGeometry(o.size,48,48),new THREE.MeshStandardMaterial({map:textureFor(o.color,i),roughness:.82}));mesh.position.x=o.orbit;mesh.userData.objectIndex=i;group.add(mesh);planetMeshes.push(mesh);if(o.kind==='Planet'&&o.name==='Saturn'){const ring=new THREE.Mesh(new THREE.RingGeometry(o.size*1.35,o.size*2.1,96),new THREE.MeshBasicMaterial({color:0xc8b58e,side:THREE.DoubleSide,transparent:true,opacity:.7}));ring.rotation.x=Math.PI/2.3;mesh.add(ring)}const pts=[];for(let j=0;j<200;j++){const a=j/200*Math.PI*2;pts.push(Math.cos(a)*o.orbit,0,Math.sin(a)*o.orbit)}const g=new THREE.BufferGeometry().setFromPoints(pts);scene.add(new THREE.LineLoop(g,new THREE.LineBasicMaterial({color:0x294363,transparent:true,opacity:.45})))});
-const blackhole=new THREE.Group();blackhole.position.set(-13,3,-16);const hole=new THREE.Mesh(new THREE.SphereGeometry(1.8,48,48),new THREE.MeshBasicMaterial({color:0x010106}));blackhole.add(hole);const disk=new THREE.Mesh(new THREE.TorusGeometry(2.6,.35,12,100),new THREE.MeshBasicMaterial({color:0x9c62ff,transparent:true,opacity:.8}));disk.rotation.x=.32;blackhole.add(disk);scene.add(blackhole);const disk2=new THREE.Mesh(new THREE.TorusGeometry(3.15,.08,8,100),new THREE.MeshBasicMaterial({color:0xffa26b,transparent:true,opacity:.6}));disk2.rotation.x=.32;blackhole.add(disk2);
-raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();renderer.domElement.addEventListener('click',e=>{const rect=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-rect.left)/rect.width)*2-1;mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(mouse,camera);const hit=raycaster.intersectObjects(planetMeshes);if(hit.length){const o=objects[hit[0].object.userData.objectIndex];if(o)selectObject(o.name,true)}});window.addEventListener('resize',resize3D);animate3D()}
+function init3D(){
+ const host=$('.sim-stage');
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x050816);
+ camera=new THREE.PerspectiveCamera(48,host.clientWidth/Math.max(1,host.clientHeight),.1,900);
+ camera.position.set(0,25,47);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ renderer.setSize(host.clientWidth,host.clientHeight);
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;
+ renderer.domElement.style.position='absolute';
+ renderer.domElement.style.inset='0';
+ renderer.domElement.style.zIndex='1';
+ host.appendChild(renderer.domElement);
+ controls=new OrbitControls(camera,renderer.domElement);
+ controls.enableDamping=true;controls.dampingFactor=.05;
+ controls.minDistance=5;controls.maxDistance=220;
+ controls.maxPolarAngle=Math.PI*.49;
+ scene.add(new THREE.AmbientLight(0x91b5ec,.8));
+ scene.add(new THREE.PointLight(0xffd6a0,210,200,1.3));
+ const starGeo=new THREE.BufferGeometry(),pos=new Float32Array(5200*3);
+ for(let i=0;i<5200;i++){const r=THREE.MathUtils.randFloat(65,240),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(2),q=Math.sqrt(1-z*z);pos.set([r*q*Math.cos(a),r*z,r*q*Math.sin(a)],i*3)}
+ starGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+ scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xc6ddff,size:.32,transparent:true,opacity:.9})));
+ const sun=new THREE.Mesh(new THREE.SphereGeometry(2.1,48,48),new THREE.MeshBasicMaterial({color:0xffbc65}));
+ sun.userData.objectIndex=0;scene.add(sun);planetMeshes.push(sun);
+ scene.add(new THREE.PointLight(0xffa64d,70,40));
+ const displayPositions={
+  'Moon':[-8,1,5],'Phobos':[-11,-1,5],'Europa':[-14,2,5],'Titan':[-17,-2,5],'Ganymede':[-20,1,5],
+  'Halley’s Comet':[-8,4,-8],'Asteroid Vesta':[-12,-3,-8],
+  'Sagittarius A*':[-16,3,-12],'M87*':[-23,-2,-12],
+  'Andromeda Galaxy':[13,3,-15],'Pleiades':[19,1,-12],'Orion Nebula':[25,-2,-10]
+ };
+ objects.forEach((o,i)=>{
+  if(i===0)return;
+  const group=new THREE.Group();
+  const orbital=o.orbit>0;
+  if(orbital){group.position.set(0,0,0);orbitGroups.push(group)}
+  else {const p=displayPositions[o.name]||[30+i,0,-10];group.position.set(p[0],p[1],p[2])}
+  scene.add(group);
+  const material=new THREE.MeshStandardMaterial({map:textureFor(o.color,i),roughness:.82,metalness:.02});
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(o.size,48,48),material);
+  if(orbital)mesh.position.x=o.orbit;
+  mesh.userData.objectIndex=i;group.add(mesh);planetMeshes.push(mesh);
+  if(o.name==='Saturn'){
+   const ring=new THREE.Mesh(new THREE.RingGeometry(o.size*1.35,o.size*2.1,96),new THREE.MeshBasicMaterial({color:0xc8b58e,side:THREE.DoubleSide,transparent:true,opacity:.72}));
+   ring.rotation.x=Math.PI/2.3;mesh.add(ring);
+  }
+  if(o.kind==='Black hole'){
+   mesh.material=new THREE.MeshBasicMaterial({color:0x010106});
+   const disk=new THREE.Mesh(new THREE.TorusGeometry(o.size*1.65,o.size*.42,16,120),new THREE.MeshBasicMaterial({color:o.color,side:THREE.DoubleSide,transparent:true,opacity:.88}));
+   disk.rotation.x=.28;group.add(disk);
+   const outer=new THREE.Mesh(new THREE.TorusGeometry(o.size*2.05,.07,8,120),new THREE.MeshBasicMaterial({color:0xffbd83,transparent:true,opacity:.72}));
+   outer.rotation.x=.28;group.add(outer);
+  }
+  if(o.kind==='Galaxy'||o.kind==='Nebula'){
+   const halo=new THREE.Mesh(new THREE.SphereGeometry(o.size*1.55,32,32),new THREE.MeshBasicMaterial({color:o.color,transparent:true,opacity:.12,side:THREE.BackSide}));
+   group.add(halo);
+   const swirl=new THREE.Mesh(new THREE.TorusGeometry(o.size*1.25,.045,6,100),new THREE.MeshBasicMaterial({color:o.color,transparent:true,opacity:.6}));
+   swirl.rotation.x=.7;group.add(swirl);
+  }
+  if(o.kind==='Star cluster'){
+   const starPositions=[];
+   for(let n=0;n<90;n++){const radius=THREE.MathUtils.randFloat(.3,2.8),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(1);starPositions.push(Math.cos(a)*radius,z*radius*.45,Math.sin(a)*radius)}
+   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(starPositions,3));
+   group.add(new THREE.Points(geo,new THREE.PointsMaterial({color:0xc9e6ff,size:.11, sizeAttenuation:true})));
+  }
+  if(orbital){
+   const pts=[];for(let j=0;j<200;j++){const a=j/200*Math.PI*2;pts.push(Math.cos(a)*o.orbit,0,Math.sin(a)*o.orbit)}
+   const g=new THREE.BufferGeometry().setFromPoints(pts);
+   scene.add(new THREE.LineLoop(g,new THREE.LineBasicMaterial({color:0x294363,transparent:true,opacity:.45})));
+  }
+ });
+ raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+ renderer.domElement.addEventListener('click',e=>{
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hit=raycaster.intersectObjects(planetMeshes);
+  if(hit.length){const o=objects[hit[0].object.userData.objectIndex];if(o)selectObject(o.name,true)}
+ });
+ window.addEventListener('resize',resize3D);
+ animate3D();
+}
 function resize3D(){if(!camera||!renderer)return;const host=$('.sim-stage');camera.aspect=host.clientWidth/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)}
 function animate3D(now=0){requestAnimationFrame(animate3D);if(!renderer)return;const dt=Math.min(.05,(now-(animate3D.last||now))/1000);animate3D.last=now;if(!paused){orbitGroups.forEach((g,i)=>g.rotation.y+=dt*(.008/(1+i*.23)));planetMeshes.forEach(m=>m.rotation.y+=dt*.09)}if(cameraTween){const t=Math.min(1,(now-cameraTween.start)/900),e=1-Math.pow(1-t,3);camera.position.lerpVectors(cameraTween.from,cameraTween.to,e);controls.target.lerpVectors(cameraTween.fromTarget,cameraTween.toTarget,e);if(t>=1)cameraTween=null}controls.update();renderer.render(scene,camera)}
-function focusObject(name){const o=objects.find(x=>x.name===name);if(!o||!camera)return;let mesh=planetMeshes.find(m=>objects[m.userData.objectIndex]?.name===name);let target;if(mesh)target=mesh.getWorldPosition(new THREE.Vector3());else if(name==='Sun')target=new THREE.Vector3(0,0,0);else target=new THREE.Vector3(-13,3,-16);const dir=new THREE.Vector3().subVectors(camera.position,controls.target).normalize();cameraTween={from:camera.position.clone(),to:target.clone().add(dir.multiplyScalar(Math.max(7,o.size*5))),fromTarget:controls.target.clone(),toTarget:target,start:performance.now()}}
+function focusObject(name){const o=objects.find(x=>x.name===name);if(!o||!camera)return;const mesh=planetMeshes.find(m=>objects[m.userData.objectIndex]?.name===name);const target=mesh?mesh.getWorldPosition(new THREE.Vector3()):new THREE.Vector3();const dir=new THREE.Vector3().subVectors(camera.position,controls.target).normalize();cameraTween={from:camera.position.clone(),to:target.clone().add(dir.multiplyScalar(Math.max(7,o.size*5))),fromTarget:controls.target.clone(),toTarget:target,start:performance.now()}}
 function selectObject(name,focus=false){const o=objects.find(x=>x.name===name);if(!o)return;selectedName=name;selectedIndex=objects.indexOf(o);$('#objectName').textContent=o.name;$('#objectDesc').textContent=o.desc;$('#objectFacts').innerHTML='<div><span>CLASSIFICATION</span><b>'+o.kind+'</b></div><div><span>DISTANCE</span><b>'+o.distance+'</b></div><div><span>QUICK FACT</span><b>'+o.fact+'</b></div>';$('#favoriteSelected').textContent=favorites.includes(name)?'♥ SAVED TO FAVORITES':'♡ SAVE TO FAVORITES';document.querySelectorAll('.object-chip').forEach(b=>b.classList.toggle('active',b.dataset.name===name));if(focus)focusObject(name)}
 function renderObjectChips(){const el=$('#objectChips');el.innerHTML='';objects.forEach(o=>{const b=document.createElement('button');b.className='object-chip';b.dataset.name=o.name;b.textContent=o.name;b.addEventListener('click',()=>selectObject(o.name,true));el.appendChild(b)})}
 function renderTravelChoices(){const el=$('#travelChoices');objects.filter(o=>['Planet','Dwarf planet','Moon','Black hole','Galaxy','Nebula'].includes(o.kind)).forEach(o=>{const b=document.createElement('button');b.className='travel-choice'+(o.name===travelTarget?' active':'');b.innerHTML='<i style="background:#'+o.color.toString(16).padStart(6,'0')+'"></i>'+o.name;b.addEventListener('click',()=>{travelTarget=o.name;renderTravelChoices();$('#travelStatus').textContent='DESTINATION LOCKED';$('#travelDistance').textContent='DESTINATION: '+o.name.toUpperCase()});el.appendChild(b)})}
