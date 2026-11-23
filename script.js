@@ -238,13 +238,15 @@ function renderSelectors(){
 function guideCard(body){
  const article=document.createElement('article');article.className='guide-card';article.tabIndex=0;
  article.style.setProperty('--color','#'+body.color.toString(16).padStart(6,'0'));article.style.setProperty('--light','#'+body.light.toString(16).padStart(6,'0'));article.style.setProperty('--glow','rgba(115,180,240,.2)');
- article.innerHTML='<div class="guide-visual"><span></span></div><span class="guide-type">'+(body.type||body.kind).toUpperCase()+'</span><h3>'+body.name+'</h3><p>'+body.summary+'</p><div class="guide-meta"><span>'+body.diameter+'</span><span>'+body.distance+'</span></div>';
+ const facts=[['DIAMETER',body.diameter],['MASS',body.mass],['GRAVITY',body.gravity],['TEMPERATURE',body.temperature],['DAY / ROTATION',body.day],['YEAR / ORBIT',body.year],['ATMOSPHERE',body.atmosphere],['MOONS',body.moons]];
+ article.innerHTML='<div class="guide-visual"><span></span></div><span class="guide-type">'+(body.type||body.kind).toUpperCase()+'</span><h3>'+body.name+'</h3><p>'+body.summary+'</p><p class="guide-discovery"><strong>QUICK DISCOVERY</strong><br>'+body.fact+'</p><div class="guide-facts">'+facts.map(([label,value])=>'<div><small>'+label+'</small><b>'+value+'</b></div>').join('')+'</div><div class="guide-meta"><span>'+body.distance+'</span><span>OPEN 3D PROFILE ↗</span></div>';
  const open=()=>{showView('system');selectObject(body.id,true);};article.addEventListener('click',open);article.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});return article;
 }
 function renderGuide(){
- const grid=$('#guideGrid'),dwarfs=$('#dwarfGrid');grid.innerHTML='';dwarfs.innerHTML='';
+ const grid=$('#guideGrid'),dwarfs=$('#dwarfGrid'),moonGrid=$('#moonGuideGrid');grid.innerHTML='';dwarfs.innerHTML='';moonGrid.innerHTML='';
  worlds.forEach(body=>grid.appendChild(guideCard(body)));
  dwarfPlanets.forEach(body=>dwarfs.appendChild(guideCard(body)));
+ moons.forEach(body=>moonGrid.appendChild(guideCard(body)));
 }
 function renderComparison(){
  const tbody=$('#compareBody');tbody.innerHTML='';
